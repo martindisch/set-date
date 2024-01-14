@@ -1,6 +1,8 @@
 use std::path::PathBuf;
 
 use clap::Parser;
+use eyre::Result;
+use walkdir::{DirEntry, WalkDir};
 
 #[derive(Parser, Debug)]
 #[command(author, version, about)]
@@ -13,7 +15,22 @@ struct Args {
     dry_run: bool,
 }
 
-fn main() {
+fn main() -> Result<()> {
     let args = Args::parse();
-    println!("{args:?}")
+    for entry in WalkDir::new(args.directory)
+        .into_iter()
+        .filter_entry(|e| !should_skip(e))
+    {
+        println!("{}", entry?.path().display());
+    }
+
+    Ok(())
+}
+
+fn should_skip(entry: &DirEntry) -> bool {
+    entry
+        .file_name()
+        .to_str()
+        .map(|s| s.starts_with(".") || s == "Thumbs.db")
+        .unwrap_or(true)
 }
