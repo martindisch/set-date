@@ -4,6 +4,8 @@ The MIT License
 applies to:
 - clap, Copyright (c) Individual contributors
 - eyre
+- once_cell
+- regex, Copyright (c) 2014 The Rust Project Developers
 -------------------------------------------------------------------------------
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +31,8 @@ The Apache License
 applies to:
 - clap
 - eyre
+- once_cell
+- regex
 -------------------------------------------------------------------------------
                                  Apache License
                            Version 2.0, January 2004
