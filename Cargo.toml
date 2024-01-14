@@ -1,0 +1,11 @@
+[package]
+name = "set-date"
+version = "0.1.0"
+edition = "2021"
+authors = ["Martin Disch <martindisch@gmail.com>"]
+description = "Sets EXIF data based on a very specific file name convention"
+repository = "https://github.com/martindisch/set-date"
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+clap = { version = "4.4.16", features = ["derive"] }
