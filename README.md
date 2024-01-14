@@ -1,7 +1,7 @@
 # set-date
 
 A very simple and stupid tool to set EXIF data based on a very specific file
-name convention, because I'm too lazy to use ExifTool.
+name convention, because I'm too lazy to learn how to use ExifTool properly.
 
 ## License
 
