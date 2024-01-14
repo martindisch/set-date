@@ -1,11 +1,11 @@
 use std::{
     fmt::Display,
     path::{Path, PathBuf},
+    process::Command,
 };
 
 use clap::Parser;
 use eyre::{eyre, OptionExt, Result};
-use little_exif::{exif_tag::ExifTag, metadata::Metadata};
 use once_cell::sync::Lazy;
 use regex::Regex;
 use walkdir::{DirEntry, WalkDir};
@@ -32,7 +32,11 @@ fn main() -> Result<()> {
     {
         let filename = entry.file_name().to_str().ok_or_eyre("Invalid filename")?;
         let datetime = infer_datetime(filename)?;
-        write_datetime(entry.path(), &datetime.to_string())?
+        if !args.dry_run {
+            write_datetime(entry.path(), &datetime.to_string())?
+        }
+
+        println!("Processed {filename}");
     }
 
     Ok(())
@@ -100,9 +104,13 @@ impl Display for ExifDateTime<'_> {
 }
 
 fn write_datetime(image_path: &Path, datetime: &str) -> Result<()> {
-    let mut metadata = Metadata::new_from_path(image_path)?;
-    metadata.set_tag(ExifTag::DateTimeOriginal(datetime.to_string()));
-    metadata.write_to_file(&image_path)?;
+    Command::new("exiftool")
+        .args([
+            "-overwrite_original",
+            &format!("-datetimeoriginal=\"{datetime}\""),
+            image_path.to_str().ok_or_eyre("Invalid filename")?,
+        ])
+        .output()?;
 
     Ok(())
 }
