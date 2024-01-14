@@ -4,6 +4,7 @@ The MIT License
 applies to:
 - clap, Copyright (c) Individual contributors
 - eyre
+- little_exif, Copyright (c) 2022 Tobias Prisching
 - once_cell
 - regex, Copyright (c) 2014 The Rust Project Developers
 -------------------------------------------------------------------------------
@@ -31,6 +32,7 @@ The Apache License
 applies to:
 - clap
 - eyre
+- little_exif
 - once_cell
 - regex
 -------------------------------------------------------------------------------

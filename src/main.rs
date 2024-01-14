@@ -1,7 +1,11 @@
-use std::{fmt::Display, path::PathBuf};
+use std::{
+    fmt::Display,
+    path::{Path, PathBuf},
+};
 
 use clap::Parser;
 use eyre::{eyre, OptionExt, Result};
+use little_exif::{exif_tag::ExifTag, metadata::Metadata};
 use once_cell::sync::Lazy;
 use regex::Regex;
 use walkdir::{DirEntry, WalkDir};
@@ -27,8 +31,8 @@ fn main() -> Result<()> {
         .filter(|e| e.file_type().is_file())
     {
         let filename = entry.file_name().to_str().ok_or_eyre("Invalid filename")?;
-        let date = infer_date(filename)?;
-        println!("{filename}: {date}")
+        let datetime = infer_datetime(filename)?;
+        write_datetime(entry.path(), &datetime.to_string())?
     }
 
     Ok(())
@@ -48,7 +52,7 @@ fn should_skip(entry: &DirEntry) -> bool {
 /// - 2003-07-12..13 Malbun Pfläzerhütte
 /// - 2002-08-16Maighelshütte Tomasee
 /// and returns it in EXIF format `YYYY:MM:DD HH:MM:SS`.
-fn infer_date(filename: &str) -> Result<ExifDateTime> {
+fn infer_datetime(filename: &str) -> Result<ExifDateTime> {
     static REGEX: Lazy<Regex> =
         Lazy::new(|| Regex::new(r"([0-9]{4})-([0-9]{2})-?([0-9]{2})?").unwrap());
 
@@ -93,4 +97,12 @@ impl Display for ExifDateTime<'_> {
             self.day.unwrap_or("01")
         )
     }
+}
+
+fn write_datetime(image_path: &Path, datetime: &str) -> Result<()> {
+    let mut metadata = Metadata::new_from_path(image_path)?;
+    metadata.set_tag(ExifTag::DateTimeOriginal(datetime.to_string()));
+    metadata.write_to_file(&image_path)?;
+
+    Ok(())
 }

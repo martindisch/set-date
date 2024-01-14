@@ -10,6 +10,7 @@ license = "MIT OR Apache-2.0"
 [dependencies]
 clap = { version = "4.4.16", features = ["derive"] }
 eyre = "0.6.11"
+little_exif = "0.2.1"
 once_cell = "1.19.0"
 regex = "1.10.2"
 walkdir = "2.4.0"
