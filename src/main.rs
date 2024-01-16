@@ -1,10 +1,13 @@
 use std::{
     fmt::Display,
+    fs::File,
+    io::BufReader,
     path::{Path, PathBuf},
     process::Command,
 };
 
 use clap::Parser;
+use exif::{In, Reader, Tag};
 use eyre::{eyre, OptionExt, Result};
 use once_cell::sync::Lazy;
 use regex::Regex;
@@ -32,7 +35,7 @@ fn main() -> Result<()> {
     {
         let filename = entry.file_name().to_str().ok_or_eyre("Invalid filename")?;
         let datetime = infer_datetime(filename)?;
-        if !args.dry_run {
+        if !args.dry_run && read_datetime(entry.path())?.is_none() {
             write_datetime(entry.path(), &datetime.to_string())?
         }
 
@@ -48,6 +51,19 @@ fn should_skip(entry: &DirEntry) -> bool {
         .to_str()
         .map(|s| s.starts_with(".") || s == "Thumbs.db")
         .unwrap_or(true)
+}
+
+/// Returns the `DateTimeOriginal` if present.
+fn read_datetime(image_path: &Path) -> Result<Option<String>> {
+    let file = File::open(image_path)?;
+    let mut bufreader = BufReader::new(&file);
+    let exifreader = Reader::new();
+    let exif = exifreader.read_from_container(&mut bufreader)?;
+
+    match exif.get_field(Tag::DateTimeOriginal, In::PRIMARY) {
+        Some(field) => Ok(Some(field.display_value().to_string())),
+        _ => Ok(None),
+    }
 }
 
 /// Infers the date from a pattern such as
