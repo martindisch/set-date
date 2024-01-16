@@ -34,12 +34,19 @@ fn main() -> Result<()> {
         .filter(|e| e.file_type().is_file())
     {
         let filename = entry.file_name().to_str().ok_or_eyre("Invalid filename")?;
-        let datetime = infer_datetime(filename)?;
-        if !args.dry_run && !has_datetime(entry.path())? {
-            write_datetime(entry.path(), &datetime.to_string())?
+
+        if args.dry_run {
+            println!("Skipping {filename} because of dry run");
+            continue;
         }
 
-        println!("Processed {filename}");
+        if let Ok(true) = has_datetime(entry.path()) {
+            println!("Skipping {filename} because of existing EXIF tag");
+            continue;
+        }
+
+        write_datetime(entry.path(), &infer_datetime(filename)?.to_string())?;
+        println!("Wrote inferred date to {filename}");
     }
 
     Ok(())
