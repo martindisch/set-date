@@ -68,7 +68,7 @@ fn read_datetime(image_path: &Path) -> Result<Option<String>> {
 
 /// Infers the date from a pattern such as
 /// - 1996-05 Martin
-/// - 1999-08-24 Caschurn
+/// - 1999-08-24 Gaschurn
 /// - 2003-07-12..13 Malbun Pfläzerhütte
 /// - 2002-08-16Maighelshütte Tomasee
 /// and returns it in EXIF format `YYYY:MM:DD HH:MM:SS`.
