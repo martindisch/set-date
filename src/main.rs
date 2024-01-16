@@ -35,7 +35,7 @@ fn main() -> Result<()> {
     {
         let filename = entry.file_name().to_str().ok_or_eyre("Invalid filename")?;
         let datetime = infer_datetime(filename)?;
-        if !args.dry_run && read_datetime(entry.path())?.is_none() {
+        if !args.dry_run && !has_datetime(entry.path())? {
             write_datetime(entry.path(), &datetime.to_string())?
         }
 
@@ -54,16 +54,13 @@ fn should_skip(entry: &DirEntry) -> bool {
 }
 
 /// Returns the `DateTimeOriginal` if present.
-fn read_datetime(image_path: &Path) -> Result<Option<String>> {
+fn has_datetime(image_path: &Path) -> Result<bool> {
     let file = File::open(image_path)?;
     let mut bufreader = BufReader::new(&file);
     let exifreader = Reader::new();
     let exif = exifreader.read_from_container(&mut bufreader)?;
 
-    match exif.get_field(Tag::DateTimeOriginal, In::PRIMARY) {
-        Some(field) => Ok(Some(field.display_value().to_string())),
-        _ => Ok(None),
-    }
+    Ok(exif.get_field(Tag::DateTimeOriginal, In::PRIMARY).is_some())
 }
 
 /// Infers the date from a pattern such as
