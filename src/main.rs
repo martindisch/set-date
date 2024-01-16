@@ -49,7 +49,7 @@ fn should_skip(entry: &DirEntry) -> bool {
     entry
         .file_name()
         .to_str()
-        .map(|s| s.starts_with(".") || s == "Thumbs.db")
+        .map(|s| s.starts_with('.') || s == "Thumbs.db")
         .unwrap_or(true)
 }
 
